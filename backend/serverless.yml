@@ -1,0 +1,99 @@
+service:
+  
+  name: memories-app
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-aws-documentation
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    REGION: ${self:provider.region}
+    MEMORIES_TABLE: Memories-${self:provider.stage}
+    MEMORIES_ID_INDEX: userId
+    MEMORIES_SECONDARY_INDEX: timeStamp 
+    IMAGES_S3_BUCKET: memories-images-${self:provider.stage}
+    IMAGE_URL_EXPIRATION: 300
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Memories API
+        description: Serverless application for storing your memories
+    models:
+      - name: CreateMemoryRequest
+        contentType: application/json
+        schema: ${file(models/createMemoryRequest.json)}
+      - name: UpdateMemoryRequest
+        contentType: application/json
+        schema: ${file(models/updateMemoryRequest.json)}
+
+functions:
+  # Auth:
+  #   handler: src/lambda/auth/auth0Authorizer.handler
+
+  getMemories:
+    handler: src/lambda/http/getMemories.handler
+    events:
+      - http:
+          # authorizer: Auth
+          method: get
+          path: memories
+          cors: true
+          reqValidatorName: RequestBodyValidator
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
+
+resources:
+  Resources:
+
+    GatewayResponseDefault4xx:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    MemoriesDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: ${self:provider.environment.MEMORIES_ID_INDEX}
+            AttributeType: S
+          - AttributeName: ${self:provider.environment.MEMORIES_SECONDARY_INDEX}
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ${self:provider.environment.MEMORIES_ID_INDEX}
+            KeyType: HASH
+          - AttributeName: ${self:provider.environment.MEMORIES_SECONDARY_INDEX}
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.MEMORIES_TABLE}
