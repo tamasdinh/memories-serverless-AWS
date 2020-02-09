@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "Serverless app for AWS to record memories",
   "dependencies": {
+    "@types/jsonwebtoken": "^8.3.7",
+    "@types/jwk-to-pem": "^2.0.0",
     "aws-lambda": "^1.0.5",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.3",
+    "node-fetch": "^2.6.0",
     "serverless-reqvalidator-plugin": "^1.0.3",
     "source-map-support": "^0.5.10"
   },

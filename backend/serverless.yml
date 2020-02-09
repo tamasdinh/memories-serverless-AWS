@@ -40,15 +40,17 @@ custom:
         contentType: application/json
         schema: ${file(models/updateMemoryRequest.json)}
 
+
 functions:
-  # Auth:
-  #   handler: src/lambda/auth/auth0Authorizer.handler
+
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
 
   getMemories:
     handler: src/lambda/http/getMemories.handler
     events:
       - http:
-          # authorizer: Auth
+          authorizer: Auth
           method: get
           path: memories/{userId}
           cors: true
@@ -65,7 +67,7 @@ functions:
     handler: src/lambda/http/createMemory.handler
     events:
       - http:
-          # authorizer: Auth
+          authorizer: Auth
           method: post
           path: new
           cors: true
@@ -85,7 +87,7 @@ functions:
     handler: src/lambda/http/updateMemory.handler
     events:
       - http:
-          # authorizer: Auth
+          authorizer: Auth
           method: patch
           path: update/{id}
           cors: true
@@ -106,7 +108,7 @@ functions:
     handler: src/lambda/http/deleteMemory.handler
     events:
       - http:
-          # authorizer: Auth
+          authorizer: Auth
           method: delete
           path: delete/{id}
           cors: true
@@ -123,7 +125,7 @@ functions:
     handler: src/lambda/http/generateUploadURL.handler
     events:
       - http:
-          # authorizer: Auth
+          authorizer: Auth
           method: post
           path: image/{memoryId}
           cors: true
