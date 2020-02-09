@@ -7,6 +7,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-aws-documentation
+  - serverless-reqvalidator-plugin
 
 provider:
   name: aws
@@ -50,13 +51,73 @@ functions:
       - http:
           # authorizer: Auth
           method: get
-          path: memories
+          path: memories/{userId}
           cors: true
-          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Get all memories for a given user
+            description: Get all memories for a given user
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
+
+  createMemory:
+    handler: src/lambda/http/createMemory.handler
+    events:
+      - http:
+          # authorizer: Auth
+          method: post
+          path: new
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new memory
+            description: Create a new memory
+            requestModels:
+              'application/json': CreateMemoryRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
+
+  updateMemory:
+    handler: src/lambda/http/updateMemory.handler
+    events:
+      - http:
+          # authorizer: Auth
+          method: patch
+          path: update/{id}
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update an existing memory
+            description: Update an existing memory
+            requestModels:
+              'application/json': UpdateMemoryRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
+
+  deleteMemory:
+    handler: src/lambda/http/deleteMemory.handler
+    events:
+      - http:
+          # authorizer: Auth
+          method: delete
+          path: delete/{id}
+          cors: true
+          documentation:
+            summary: Remove a memory
+            description: Remove a memory
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
 
 resources:

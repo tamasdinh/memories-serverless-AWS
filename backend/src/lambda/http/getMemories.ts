@@ -4,7 +4,7 @@ import { getMemories } from '../../businessLogic/memoriesLogic'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
-  const userID = 'tamasdinh'
+  const userID = event.pathParameters.userId
 
   const response = await getMemories(userID)
 

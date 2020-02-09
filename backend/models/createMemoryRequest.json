@@ -3,6 +3,9 @@
   "title": "createMemory",
   "type": "object",
   "properties": {
+    "userId": {
+      "type": "string"
+    },
     "date": {
       "type": "string"
     },
@@ -17,10 +20,10 @@
     }
   },
   "required": [
+    "userId",
     "date",
     "title",
-    "memoryText",
-    "imageURL"
+    "memoryText"
   ],
   "additionalProperties": false
 }

@@ -3,9 +3,6 @@
   "title": "updateMemory",
   "type": "object",
   "properties": {
-    "date": {
-      "type": "string"
-    },
     "title": {
       "type": "string"
     },
@@ -16,9 +13,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "date",
-    "title"
-  ],
   "additionalProperties": false
 }

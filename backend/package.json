@@ -4,6 +4,7 @@
   "description": "Serverless app for AWS to record memories",
   "dependencies": {
     "aws-lambda": "^1.0.5",
+    "serverless-reqvalidator-plugin": "^1.0.3",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
