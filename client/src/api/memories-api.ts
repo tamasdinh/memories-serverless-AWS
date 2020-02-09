@@ -1,15 +1,10 @@
 import { apiEndpoint } from '../config'
 import { MemoryItem } from '../../../backend/src/models/memoryItem';
 import { CreateMemoryRequest } from '../../../backend/src/requests/createMemoryRequest';
-import Axios, { AxiosResponse } from 'axios'
+import Axios from 'axios'
 import { UpdateMemoryRequest } from '../../../backend/src/requests/UpdateMemoryRequest';
-import { decode } from 'jsonwebtoken'
-import { Jwt } from '../../../backend/src/auth/Jwt'
 
 export async function getMemories(idToken: string): Promise<MemoryItem[]> {
-
-  const jwt = decode(idToken, { complete: true }) as Jwt
-  const userID = jwt.payload.sub
 
   const response = await Axios.get(`${apiEndpoint}/memories`, {
     headers: {
