@@ -10,7 +10,8 @@
     "jwk-to-pem": "^2.0.3",
     "node-fetch": "^2.6.0",
     "serverless-reqvalidator-plugin": "^1.0.3",
-    "source-map-support": "^0.5.10"
+    "source-map-support": "^0.5.10",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",

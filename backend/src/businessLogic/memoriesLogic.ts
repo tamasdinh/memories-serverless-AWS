@@ -3,6 +3,7 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { CreateMemoryRequest } from '../requests/createMemoryRequest'
 import { UpdateMemoryRequest } from '../requests/UpdateMemoryRequest'
 import { MemoriesS3Access } from '../dataLayer/memoriesS3Access'
+import { MemoryItem } from '../models/memoryItem'
 
 const DB = new memoriesDBAccess()
 const S3 = new MemoriesS3Access()
@@ -11,12 +12,17 @@ export async function getMemories (userID: string): Promise<DocumentClient.Attri
   return await DB.getMemories(userID)
 }
 
-export async function createMemory (memoryItem: CreateMemoryRequest): Promise<CreateMemoryRequest> {
+export async function createMemory (userID: string, memoryItem: CreateMemoryRequest): Promise<CreateMemoryRequest> {
 
-  memoryItem.timeStamp = Date.now().toString()
+  let newItem: MemoryItem = {
+    ...memoryItem,
+    userId: userID,
+    timeStamp: Date.now().toString(),
+    revisited: false
+  }
   
-  await DB.createMemory(memoryItem)
-  return memoryItem
+  await DB.createMemory(newItem)
+  return newItem
 }
 
 export async function updateMemory (userID: string, timeStamp: string, updatedMemory: UpdateMemoryRequest): Promise<void> {
@@ -27,6 +33,6 @@ export async function deleteMemory (userID: string, timeStamp: string): Promise<
   return await DB.deleteMemory(userID, timeStamp)
 }
 
-export function getSignedUrl (memoryId: string): string {
-  return S3.getSignedUrl(memoryId)
+export function getSignedUrl (userID: string, timeStamp: string): string {
+  return S3.getSignedUrl(userID, timeStamp)
 }

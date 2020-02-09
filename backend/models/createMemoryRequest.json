@@ -12,18 +12,13 @@
     "title": {
       "type": "string"
     },
-    "memoryText": {
-      "type": "string"
-    },
     "imageURL" : {
       "type": "string"
     }
   },
   "required": [
-    "userId",
     "date",
-    "title",
-    "memoryText"
+    "title"
   ],
   "additionalProperties": false
 }

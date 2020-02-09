@@ -1,5 +1,6 @@
 export interface UpdateMemoryRequest {
+  date?: string,
+  revisited?: boolean,
   title?: string,
-  memoryText?: string,
   imageURL?: string 
 }

@@ -8,10 +8,10 @@ export class MemoriesS3Access {
     private readonly urlExpiration: number = Number(process.env.IMAGE_URL_EXPIRATION)
   ){}
 
-  getSignedUrl(memoryId: string): string {
+  getSignedUrl(userID: string, timeStamp: string): string {
     return this.s3.getSignedUrl('putObject', {
       Bucket: this.memoriesImagesBucket,
-      Key: memoryId,
+      Key: `${userID}-${timeStamp}`,
       Expires: this.urlExpiration
     })
   }

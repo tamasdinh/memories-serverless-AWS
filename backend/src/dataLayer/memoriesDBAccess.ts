@@ -1,6 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { UpdateMemoryRequest } from '../requests/UpdateMemoryRequest'
-import { CreateMemoryRequest } from '../requests/createMemoryRequest'
+import { MemoryItem } from '../models/memoryItem'
 
 export class memoriesDBAccess {
 
@@ -23,10 +23,10 @@ export class memoriesDBAccess {
     return response.Items
   }
 
-  async createMemory (memoryItem: CreateMemoryRequest): Promise<void> {
+  async createMemory (newItem: MemoryItem): Promise<void> {
     await this.docClient.put({
       TableName: this.memoriesTable,
-      Item: memoryItem
+      Item: newItem
     }).promise()
   }
 
@@ -52,10 +52,10 @@ export class memoriesDBAccess {
         userId,
         timeStamp
       },
-      UpdateExpression: 'set title = :title, memoryText = :memoryText, imageURL = :imageURL',
+      UpdateExpression: 'set title = :title, revisited = :revisited, imageURL = :imageURL',
       ExpressionAttributeValues: {
         ':title': updatedMemory.title ? updatedMemory.title : existingItem.Items[0].title,
-        ':memoryText': updatedMemory.memoryText ? updatedMemory.memoryText : existingItem.Items[0].memoryText,
+        ':revisited': updatedMemory.revisited ? updatedMemory.revisited : existingItem.Items[0].revisited,
         ':imageURL': updatedMemory.imageURL ? updatedMemory.imageURL : (existingItem.Items[0].imageURL || " ")
       }
     }).promise()

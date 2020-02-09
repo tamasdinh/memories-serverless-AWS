@@ -11,6 +11,10 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
+
+  # stage: ${opt:stage, 'dev'}
+  # region: ${opt:region, 'us-east-1'}
+
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
   environment:
@@ -52,7 +56,7 @@ functions:
       - http:
           authorizer: Auth
           method: get
-          path: memories/{userId}
+          path: memories
           cors: true
           documentation:
             summary: Get all memories for a given user
@@ -89,7 +93,7 @@ functions:
       - http:
           authorizer: Auth
           method: patch
-          path: update/{id}
+          path: update/{timeStamp}
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
@@ -110,7 +114,7 @@ functions:
       - http:
           authorizer: Auth
           method: delete
-          path: delete/{id}
+          path: delete/{timeStamp}
           cors: true
           documentation:
             summary: Remove a memory
@@ -127,7 +131,7 @@ functions:
       - http:
           authorizer: Auth
           method: post
-          path: image/{memoryId}
+          path: image/{timeStamp}
           cors: true
     iamRoleStatements:
       - Effect: Allow
@@ -154,7 +158,7 @@ resources:
       Properties:
         Name: 'request-body-validator'
         RestApiId:
-          Ref: ApiGatewayRestApi
+          Ref: 'ApiGatewayRestApi'
         ValidateRequestBody: true
         ValidateRequestParameters: false
 

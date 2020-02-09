@@ -6,8 +6,8 @@
     "title": {
       "type": "string"
     },
-    "memoryText": {
-      "type": "string"
+    "revisited": {
+      "type": "boolean"
     },
     "imageURL" : {
       "type": "string"

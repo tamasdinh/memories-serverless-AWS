@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Form, Button } from 'semantic-ui-react'
 import Auth from '../auth/Auth'
-import { getUploadUrl, uploadFile } from '../api/todos-api'
+import { getUploadUrl, uploadFile, updateMemory } from '../api/memories-api'
 
 enum UploadState {
   NoUpload,
@@ -9,25 +9,25 @@ enum UploadState {
   UploadingFile,
 }
 
-interface EditTodoProps {
+interface EditMemoryProps {
   match: {
     params: {
-      todoId: string
+      timeStamp: string
     }
   }
   auth: Auth
 }
 
-interface EditTodoState {
+interface EditMemoryState {
   file: any
   uploadState: UploadState
 }
 
-export class EditTodo extends React.PureComponent<
-  EditTodoProps,
-  EditTodoState
+export class EditMemory extends React.PureComponent<
+  EditMemoryProps,
+  EditMemoryState
 > {
-  state: EditTodoState = {
+  state: EditMemoryState = {
     file: undefined,
     uploadState: UploadState.NoUpload
   }
@@ -53,10 +53,15 @@ export class EditTodo extends React.PureComponent<
       this.setUploadState(UploadState.FetchingPresignedUrl)
       const uploadUrl = await getUploadUrl(
         this.props.auth.getIdToken(),
-        this.props.match.params.todoId)
+        this.props.match.params.timeStamp)
 
       this.setUploadState(UploadState.UploadingFile)
       await uploadFile(uploadUrl, this.state.file)
+      await updateMemory(
+        this.props.auth.getIdToken(),
+        this.props.match.params.timeStamp,
+        { imageURL: uploadUrl.split('?')[0] }
+      )
 
       alert('File was uploaded!')
     } catch (e) {

@@ -1,7 +1,5 @@
 export interface CreateMemoryRequest {
-  userId: string,
-  timeStamp: string,
+  date: string,
   title: string,
-  memoryText: string,
   imageURL?: string
 }

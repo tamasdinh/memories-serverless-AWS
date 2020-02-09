@@ -5,13 +5,17 @@ import { decode, verify } from 'jsonwebtoken'
 import * as jwkToPem from 'jwk-to-pem'
 import { JwtPayload } from '../../auth/JwtPayload'
 import { Jwt } from '../../auth/Jwt'
+import { createLogger } from '../../logger/logger'
+
+const logger = createLogger('auth')
 
 const jwksUrl = 'https://td-dev2019.eu.auth0.com/.well-known/jwks.json'
 
 export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEvent): Promise<CustomAuthorizerResult> => {
-  
+  logger.info('Authorizing a user', event.authorizationToken)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
+    logger.info('User was authorized', jwtToken)
     
     return {
       principalId: jwtToken.sub,
@@ -27,6 +31,7 @@ export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEv
       }
     }
   } catch(error) {
+    logger.error('User not authorized', { error: error.message })
 
     return {
       principalId: 'user',
@@ -53,10 +58,12 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 
   await fetch(jwksUrl)
   .then(res => res.json())
-  .then(res => {
+  .then(res => (
     res.keys.find(item => item.alg === jwt.header.alg && item.kid === jwt.header.kid)
+  ))
+  .then(auth0Key => {
+    verify(token, jwkToPem(auth0Key), {algorithms: ['RS256']})
   })
-  .then(auth0Key => verify(token, jwkToPem(auth0Key), {algorithms: ['RS256']}))
 
   return jwt.payload
 }
