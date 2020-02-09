@@ -1,5 +1,4 @@
 service:
-  
   name: memories-app
 
 # Add the serverless-webpack plugin
@@ -20,7 +19,7 @@ provider:
     MEMORIES_TABLE: Memories-${self:provider.stage}
     MEMORIES_ID_INDEX: userId
     MEMORIES_SECONDARY_INDEX: timeStamp 
-    IMAGES_S3_BUCKET: memories-images-${self:provider.stage}
+    IMAGES_S3_BUCKET: memories-images2020-${self:provider.stage}
     IMAGE_URL_EXPIRATION: 300
 
 custom:
@@ -120,6 +119,20 @@ functions:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEMORIES_TABLE}
 
+  generateUploadUrl:
+    handler: src/lambda/http/generateUploadURL.handler
+    events:
+      - http:
+          # authorizer: Auth
+          method: post
+          path: image/{memoryId}
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*'
+
 resources:
   Resources:
 
@@ -158,3 +171,35 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.MEMORIES_TABLE}
+
+    MemoriesImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: Memories-app-S3-Policy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*'
+        Bucket: !Ref MemoriesImagesBucket

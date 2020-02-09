@@ -1,7 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { UpdateMemoryRequest } from '../requests/UpdateMemoryRequest'
 import { CreateMemoryRequest } from '../requests/createMemoryRequest'
-import { MemoryItem } from '../models/memoryItem'
 
 export class memoriesDBAccess {
 
