@@ -8,7 +8,7 @@
     "aws-lambda": "^1.0.5",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "serverless-reqvalidator-plugin": "^1.0.3",
     "source-map-support": "^0.5.10",
     "winston": "^3.2.1"
